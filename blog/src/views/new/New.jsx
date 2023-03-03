@@ -15,27 +15,96 @@ const NewBlogPost = (props) => {
     setHTML(html);
   }, [editorState]);
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("Category1");
+  const [category, setCategory] = useState("HTML");
+  const [coverFile, setCoverFile] = useState("");
+  const [time, setTime] = useState(1);
+  const [timeUnit, setTimeUnit] = useState("minute");
+  const [authorName, setAuthorName] = useState("");
+  const [authorSurname, setAuthorSurname] = useState("");
+  const [authorAvatar, setAuthorAvatar] = useState("");
+
+  const [blogPost, setBlogPost] = useState(null);
 
   const sendPost = async () => {
+    try {
+      let response = await fetch("http://localhost:3002/authors");
+      if (response.ok) {
+        console.log(response);
+        let authors = await response.json();
+        let author = authors.find(
+          (author) =>
+            author.name.toLowerCase() === authorName.toLowerCase() &&
+            author.surname.toLowerCase() === authorSurname.toLowerCase()
+        );
+        if (author) {
+          console.log(author.avatar);
+          setAuthorAvatar(author.avatar);
+        } else {
+          setAuthorAvatar(
+            `https://ui-avatars.com/api/?name=${authorName}+${authorSurname}`
+          );
+        }
+      } else {
+        console.log("Error!!!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCoverUpload = async (id) => {
+    try {
+      const formData = new FormData();
+      formData.append("cover", coverFile);
+      let response = await fetch(
+        `http://localhost:3002/blogPosts/${id}/uploadCover`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      if (response.ok) {
+        console.log("Yey!");
+      } else {
+        console.log("Try again!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (coverFile) {
+      handleCoverUpload(blogPost._id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blogPost]);
+
+  useEffect(() => {
+    if (authorAvatar) {
+      sendsPost();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authorAvatar]);
+
+  const sendsPost = async () => {
     try {
       let newPost = {
         category: category,
         title: title,
-        cover:
-          "https://images.ctfassets.net/usf1vwtuqyxm/3d9kpFpwHyjACq8H3EU6ra/85673f9e660407e5e4481b1825968043/English_Harry_Potter_4_Epub_9781781105672.jpg",
+        cover: "https://picsum.photos/800/400",
         readTime: {
-          value: 2,
-          unit: "minute",
+          value: time,
+          unit: timeUnit,
         },
         author: {
-          name: "Farhana Rafi",
-          avatar:
-            "https://images.ctfassets.net/usf1vwtuqyxm/3d9kpFpwHyjACq8H3EU6ra/85673f9e660407e5e4481b1825968043/English_Harry_Potter_4_Epub_9781781105672.jpg",
+          name: `${authorName.toUpperCase()} ${authorSurname.toUpperCase()}`,
+          avatar: authorAvatar,
         },
         content: html,
       };
-      let response = await fetch("http://localhost:3001/blogPosts/", {
+      let response = await fetch("http://localhost:3002/blogPosts/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +112,9 @@ const NewBlogPost = (props) => {
         body: JSON.stringify(newPost),
       });
       if (response.ok) {
-        console.log(response);
+        let post = await response.json();
+        setBlogPost(post);
+        console.log(authorAvatar);
       } else {
         console.log("Error!!!");
       }
@@ -77,12 +148,69 @@ const NewBlogPost = (props) => {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
-            <option>Category1</option>
-            <option>Category2</option>
-            <option>Category3</option>
-            <option>Category4</option>
-            <option>Category5</option>
+            <option>HTML</option>
+            <option>JavaScript</option>
+            <option>Computer basics</option>
+            <option>News</option>
+            <option>Romantic</option>
           </Form.Control>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Cover Image</Form.Label>
+          <Form.Control
+            type="file"
+            onChange={(e) => {
+              const files = e.target.files;
+              if (files && files.length > 0) {
+                setCoverFile(files[0]);
+              } else {
+                setCoverFile(null);
+              }
+            }}
+          />
+        </Form.Group>
+        <Form.Group className="mt-3">
+          <Form.Label>Time to read</Form.Label>
+          <Form.Control
+            type="number"
+            value={time}
+            onChange={(e) => {
+              setTime(e.target.value);
+            }}
+          />
+        </Form.Group>
+        <Form.Group className="mt-3">
+          <Form.Label>Time unit</Form.Label>
+          <Form.Control
+            size="lg"
+            as="select"
+            value={timeUnit}
+            onChange={(e) => setTimeUnit(e.target.value)}
+          >
+            <option>minute</option>
+            <option>hour</option>
+            <option>day</option>
+          </Form.Control>
+        </Form.Group>
+        <Form.Group className="mt-3">
+          <Form.Label>Author Name</Form.Label>
+          <Form.Control
+            type="text"
+            value={authorName}
+            onChange={(e) => {
+              setAuthorName(e.target.value);
+            }}
+          />
+        </Form.Group>
+        <Form.Group className="mt-3">
+          <Form.Label>Author Surname</Form.Label>
+          <Form.Control
+            type="text"
+            value={authorSurname}
+            onChange={(e) => {
+              setAuthorSurname(e.target.value);
+            }}
+          />
         </Form.Group>
         <Form.Group controlId="blog-content" className="mt-3">
           <Form.Label>Blog Content</Form.Label>
