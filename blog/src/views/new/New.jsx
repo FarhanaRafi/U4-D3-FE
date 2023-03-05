@@ -64,7 +64,7 @@ const NewBlogPost = (props) => {
         }
       );
       if (response.ok) {
-        console.log("Yey!");
+        console.log("done!");
       } else {
         console.log("Try again!");
       }
