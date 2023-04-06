@@ -7,7 +7,7 @@ const NavBar = (props) => {
   const [query, setQuery] = useState("");
 
   const fetchBlog = async () => {
-    let res = await fetch("http://localhost:3002/blogPosts?title=" + query);
+    let res = await fetch("http://localhost:3001/blogPosts?title=" + query);
     if (res.ok) {
       let data = await res.json();
       console.log(data);

@@ -22,12 +22,17 @@ const NewBlogPost = (props) => {
   const [authorName, setAuthorName] = useState("");
   const [authorSurname, setAuthorSurname] = useState("");
   const [authorAvatar, setAuthorAvatar] = useState("");
+  const token = localStorage.getItem("token");
 
   const [blogPost, setBlogPost] = useState(null);
 
   const sendPost = async () => {
     try {
-      let response = await fetch("http://localhost:3002/authors");
+      let response = await fetch("http://localhost:3001/authors", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.ok) {
         console.log(response);
         let authors = await response.json();
@@ -57,7 +62,7 @@ const NewBlogPost = (props) => {
       const formData = new FormData();
       formData.append("cover", coverFile);
       let response = await fetch(
-        `http://localhost:3002/blogPosts/${id}/uploadCover`,
+        `http://localhost:3001/blogPosts/${id}/uploadCover`,
         {
           method: "POST",
           body: formData,
@@ -104,10 +109,11 @@ const NewBlogPost = (props) => {
         },
         content: html,
       };
-      let response = await fetch("http://localhost:3002/blogPosts/", {
+      let response = await fetch("http://localhost:3001/blogPosts/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(newPost),
       });

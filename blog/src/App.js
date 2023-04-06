@@ -1,18 +1,22 @@
-import "./App.css"
+import "./App.css";
 import React from "react";
-import NavBar from "./components/navbar/BlogNavbar";
+// import NavBar from "./components/navbar/BlogNavbar";
 import Footer from "./components/footer/Footer";
 import Home from "./views/home/Home";
 import Blog from "./views/blog/Blog";
 import NewBlogPost from "./views/new/New";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import LoginPage from "./views/login/login";
+import RegisterPage from "./views/login/register";
 
 function App() {
   return (
     <Router>
-      <NavBar />
+      {/* <NavBar /> */}
       <Routes>
-        <Route path="/" exact element={<Home />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/home" exact element={<Home />} />
         <Route path="/blog/:id" element={<Blog />} />
         <Route path="/new" element={<NewBlogPost />} />
       </Routes>
