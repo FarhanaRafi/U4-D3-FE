@@ -102,7 +102,7 @@ const Blog = (props) => {
   const handleDelete = async (postId, commentId) => {
     try {
       await fetch(
-        `http://localhost:3002/blogPosts/${postId}/comments/${commentId}`,
+        `http://localhost:3001/blogPosts/${postId}/comments/${commentId}`,
         {
           method: "DELETE",
         }
